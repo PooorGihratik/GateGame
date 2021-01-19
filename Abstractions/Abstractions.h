@@ -55,6 +55,8 @@ public:
     virtual void unblock() = 0;
     virtual void setPosition(float x, float y) = 0;
     virtual IComponent* getComponent() = 0;
+    virtual float getPositionX() = 0;
+    virtual float getPositionY() = 0;
     virtual ~IComponentController() = default;
 };
 
