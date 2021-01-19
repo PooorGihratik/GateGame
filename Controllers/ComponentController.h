@@ -16,11 +16,14 @@ private:
     list<IWireController*> wireControllers;
     list<IConnectorController*> connectorControllers;
     bool isBlocked = false;
+    bool hasConnectionFocus = false;
     Vector2f position;
     Vector2f size;
     Vector2f bufferPosition;
 public:
     ComponentController(IComponent* component, ComponentFieldController* field, Vector2f position);
+    ~ComponentController() override;
+
     void checkEvents(Event event, bool WireBlock, bool ConnectorBlock) override;
     void gotFocus();
     void lostFocus();
@@ -28,11 +31,12 @@ public:
     void unblock() override;
     void render() override;
     void setPosition(float x, float y) override { position = Vector2f(x,y); }
-    Vector2f getPosition() { return bufferPosition; }
+    float getPositionX() override { return bufferPosition.x; }
+    float getPositionY() override { return bufferPosition.y; }
     IComponent* getComponent() override { return component; }
-    void gotWireFocus();
-    void gotConnectorFocus();
 
+    void gotWireFocus(IWireController* wire);
+    void gotConnectorFocus(IConnectorController* connector);
 };
 
 #endif //PROJECT_COMPONENTCONTROLLER_H

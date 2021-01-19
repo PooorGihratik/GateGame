@@ -6,8 +6,9 @@
 
 void MoveComponent::execute() {
     component->setPosition(x,y);
+    isExecuted = true;
 }
 
 void MoveComponent::undo() {
-    component->setPosition(bufferX,bufferY);
+    if (isExecuted) component->setPosition(bufferX,bufferY);
 }

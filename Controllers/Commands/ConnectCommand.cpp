@@ -5,8 +5,11 @@
 
 void ConnectCommand::execute() {
     connector->connectToWire(wire);
+    isExecuted = true;
 }
 
 void ConnectCommand::undo() {
-
+    if (isExecuted) {
+        // TODO Create undo() function
+    }
 }

@@ -5,6 +5,7 @@
 #include "ComponentFieldController.h"
 #include "ComponentController.h"
 #include "ConnectionControllers/ConnectionsController.h"
+#include <algorithm>
 
 #define ConstructorParams GameWindow *window, Vector2f position, Vector2f size
 #define InitList window(window), position(position), size(size)
@@ -43,6 +44,8 @@ void ComponentFieldController::componentFocusEvent(IComponentController* compone
     for (auto &controller:controllers) {
         if (component != controller) controller->block();
     }
+    auto iter = find(controllers.begin(), controllers.end(), component);
+    swap(iter,--controllers.end());
 }
 
 void ComponentFieldController::lostFocusEvent() {
@@ -72,7 +75,7 @@ IComponentController* ComponentFieldController::addNewComponent(float x, float y
 
 void ComponentFieldController::removeComponent(IComponentController* controller) {
     network.removeComponent(controller->getComponent());
-
+    delete controller;
     controllers.remove(controller);
 }
 

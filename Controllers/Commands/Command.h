@@ -9,20 +9,23 @@
 
 class AddComponentToField : public ICommand {
 private:
-    ComponentFieldController* controller;
+    IComponentFieldController* controller;
+    IComponentController* component = nullptr;
+    bool isExecuted = false;
     float x, y;
 public:
-    AddComponentToField(ComponentFieldController* controller, float x, float y);
+    AddComponentToField(IComponentFieldController* controller, float x, float y);
     void execute() override;
     void undo() override;
 };
 
 class RemoveComponentFromField : public ICommand{
 private:
-    ComponentFieldController* controller;
+    IComponentFieldController* controller;
     IComponentController* component;
+    bool isExecuted = false;
 public:
-    RemoveComponentFromField(ComponentFieldController* controller, IComponentController component);
+    RemoveComponentFromField(IComponentFieldController* controller, IComponentController* component);
     void execute() override;
     void undo() override;
 };
@@ -32,10 +35,11 @@ private:
     IComponentController* component;
     float x,y;
     float bufferX, bufferY;
+    bool isExecuted = false;
 public:
     MoveComponent(IComponentController* component, float x, float y) : component(component), x(x), y(y) {
-        bufferX = x;
-        bufferY = y;
+        bufferX = component->getPositionX();
+        bufferY = component->getPositionY();
     };
     void execute() override;
     void undo() override;
@@ -45,6 +49,7 @@ class ConnectCommand : public ICommand {
 private:
     IWireController* wire = nullptr;
     IConnectorController* connector = nullptr;
+    bool isExecuted = false;
 public:
     void setWireController(IWireController* controller) { this->wire = controller; }
     void setConnectorController(IConnectorController* controller) { this->connector = controller; }

@@ -4,16 +4,17 @@
 
 #include "Command.h"
 
-#define ConstructorParam ComponentFieldController *controller, float x, float y
+#define ConstructorParam IComponentFieldController *controller, float x, float y
 #define InitList controller(controller), x(x), y(y)
 
 AddComponentToField::AddComponentToField(ConstructorParam) : InitList {
 }
 
 void AddComponentToField::execute() {
-    controller->addNewComponent(x,y);
+    component = controller->addNewComponent(x,y);
+    isExecuted = true;
 }
 
 void AddComponentToField::undo() {
-    controller->removeComponent()
+    if (isExecuted) controller->removeComponent(component);
 }
