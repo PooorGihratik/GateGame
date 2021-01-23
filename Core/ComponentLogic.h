@@ -1,0 +1,8 @@
+//
+// Created by Кир on 23.01.2021.
+//
+
+#ifndef GATEGAME_ICOMPONENTLOGIC_H
+#define GATEGAME_ICOMPONENTLOGIC_H
+
+#endif //GATEGAME_ICOMPONENTLOGIC_H

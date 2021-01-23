@@ -26,6 +26,8 @@ public:
     void checkWindowEvents(Event event);
     void gotFocusEvent(IController* controller);
     void lostFocusEvent();
+    void setCommand(ICommand* command) { this->command = command; };
+    RenderWindow* getWindow() { return window; }
 };
 
 #endif //PROJECT_GAMEWINDOW_H
