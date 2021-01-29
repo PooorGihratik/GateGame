@@ -27,7 +27,7 @@ private:
     bool isBlocked = false;
 public:
     ComponentWireController(ComponentController* component,Wire* wire);
-    void checkEvents(sf::Event event, bool ConnectorBlock) override;
+    void checkEvents(sf::Event event) override;
     void block() override { isBlocked = true; }
     void unblock() override { isBlocked = false; }
     void setPosition(float x, float y) override { position = Vector2f(x,y); }
@@ -44,7 +44,7 @@ private:
     bool isBlocked = false;
 public:
     FieldWireController(ComponentFieldController* field, Wire* wire);
-    void checkEvents(sf::Event event, bool ConnectorBlock) override;
+    void checkEvents(sf::Event event) override;
     void block() override { isBlocked = true; }
     void unblock() override { isBlocked = false; }
     void setPosition(float x, float y) override { position = Vector2f(x,y); }
@@ -61,7 +61,7 @@ private:
     bool isBlocked = false;
 public:
     ComponentConnectorController(ComponentController* component,Connector* connector);
-    void checkEvents(sf::Event event, bool WireBlock) override;
+    void checkEvents(sf::Event event) override;
     void block() override { isBlocked = true; }
     void unblock() override { isBlocked = false; }
     void setPosition(float x, float y) override { position = Vector2f(x,y); }
@@ -80,7 +80,7 @@ private:
     bool isBlocked = false;
 public:
     FieldConnectorController(ComponentFieldController* field, Connector* connector);
-    void checkEvents(sf::Event event, bool WireBlock) override;
+    void checkEvents(sf::Event event) override;
     void block() override { isBlocked = true; }
     void unblock() override { isBlocked = false; }
     void setPosition(float x, float y) override { position = Vector2f(x,y); }
@@ -88,6 +88,10 @@ public:
     Connector* getConnector() override { return connector; }
 
     void connectToWire(IWireController *wire) override;
+};
+
+class LineController {
+
 };
 
 #endif //PROJECT_CONNECTIONSCONTROLLER_H

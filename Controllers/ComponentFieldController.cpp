@@ -7,15 +7,19 @@
 #include "ConnectionControllers/ConnectionsController.h"
 #include <algorithm>
 
-#define ConstructorParams GameWindow *window, Vector2f position, Vector2f size
-#define InitList window(window), position(position), size(size)
+#define ConstructorParams GameWindow *window
+#define InitList window(window)
 
 ComponentFieldController::ComponentFieldController(ConstructorParams) : InitList {
-
+    position = Vector2f(-1,-1);
+    size = Vector2f(-1,-1);
 }
 
 void ComponentFieldController::render() {
-    if (isBlocked) return;
+    RectangleShape shape = RectangleShape(size);
+    shape.setFillColor(Color(207,207,207));
+    shape.setPosition(position);
+    window->getWindow()->draw(shape);
     for (auto input:inputControllers) {
         input->render();
     }
@@ -25,58 +29,80 @@ void ComponentFieldController::render() {
     for (auto controller:controllers) {
         controller->render();
     }
+    /*auto iter = controllers.end();
+    for (int i = 0; i< controllers.size();i++) {
+        (*--iter)->render();
+    }*/
+}
+
+bool ComponentFieldController::hasSizeAndPosition() {
+    return position != Vector2f(-1,-1) && size != Vector2f(-1,-1);
 }
 
 void ComponentFieldController::checkWindowEvents(sf::Event event) {
     if (isBlocked) return;
+    auto iter = controllers.end();
+    for (int i = 0; i< controllers.size();i++) {
+        (*--iter)->checkEvents(event);
+    }
     for (auto input:inputControllers) {
-        input->checkEvents(event,f_connectorBlock);
+        input->checkEvents(event);
     }
     for (auto output:outputControllers) {
-        output->checkEvents(event,f_wireBlock);
-    }
-    for (auto controller:controllers) {
-        controller->checkEvents(event,f_wireBlock,f_connectorBlock);
+        output->checkEvents(event);
     }
 }
 
+void ComponentFieldController::lostFocusEvent() {
+    for (auto &controller:controllers) {
+        controller->unblockAll();
+    }
+    window->lostFocusEvent();
+}
+
 void ComponentFieldController::componentFocusEvent(IComponentController* component) {
+    window->gotFocusEvent(this);
     for (auto &controller:controllers) {
         if (component != controller) controller->block();
     }
     auto iter = find(controllers.begin(), controllers.end(), component);
-    swap(iter,--controllers.end());
+    swap(*iter,*--controllers.end());
 }
 
-void ComponentFieldController::lostFocusEvent() {
-    f_connectorBlock = false;
-    f_wireBlock = false;
-    for (auto &controller:controllers) {
-        controller->unblock();
+void ComponentFieldController::wireFocusEvent(IWireController* wire) {
+    window->gotFocusEvent(this);
+    for ( auto inputController : inputControllers ) {
+        if (inputController != wire) inputController->block();
+    }
+    for ( auto controller: controllers ) {
+        controller -> blockWires();
     }
 }
 
-void ComponentFieldController::lostFocus() {
-    window->lostFocusEvent();
-}
-
-void ComponentFieldController::gotFocus() {
+void ComponentFieldController::connectorFocusEvent(IConnectorController* connector) {
     window->gotFocusEvent(this);
+    for ( auto outputController : outputControllers ) {
+        if (outputController != connector) outputController->block();
+    }
+    for ( auto controller: controllers ) {
+        controller -> blockConnectors();
+    }
 }
 
 // Section for commands
 
-IComponentController* ComponentFieldController::addNewComponent(float x, float y) {
-    IComponent* component = network.addComponent();
-    IComponentController* controller = new ComponentController(component, this, Vector2f(x,y));
+IComponentController* ComponentFieldController::addNewComponent(IComponentController* controller, float x, float y) {
+    Component* component = network.addComponent();
+    controller->setComponent(component);
+    controller->setPosition(x,y);
     controllers.push_back(controller);
     return controller;
 }
 
 void ComponentFieldController::removeComponent(IComponentController* controller) {
     network.removeComponent(controller->getComponent());
-    delete controller;
     controllers.remove(controller);
+    delete controller;
 }
 
 void ComponentFieldController::addInput() {

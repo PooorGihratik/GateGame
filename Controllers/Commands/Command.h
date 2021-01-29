@@ -6,15 +6,18 @@
 #define PROJECT_COMMAND_H
 #include "../ComponentFieldController.h"
 
-
 class AddComponentToField : public ICommand {
 private:
-    IComponentFieldController* controller;
+    IComponentFieldController* field;
     IComponentController* component = nullptr;
     bool isExecuted = false;
     float x, y;
 public:
-    AddComponentToField(IComponentFieldController* controller, float x, float y);
+    AddComponentToField(IComponentFieldController* field,IComponentController* component , float x, float y);
+    void setFieldController(IComponentFieldController* controller) {
+        field = controller;
+
+    }
     void execute() override;
     void undo() override;
 };
@@ -33,8 +36,8 @@ public:
 class MoveComponent : public ICommand {
 private:
     IComponentController* component;
-    float x,y;
     float bufferX, bufferY;
+    float x,y;
     bool isExecuted = false;
 public:
     MoveComponent(IComponentController* component, float x, float y) : component(component), x(x), y(y) {
@@ -59,5 +62,44 @@ public:
     void undo() override;
 };
 
+class AddNewInput : ICommand {
+private:
+    IComponentFieldController* field;
+    bool isExecuted = false;
+public:
+    AddNewInput(IComponentFieldController* field);
+    void execute() override;
+    void undo() override;
+};
+
+class RemoveInput : ICommand {
+private:
+    IComponentFieldController* field;
+    bool isExecuted = false;
+public:
+    RemoveInput(IComponentFieldController* field);
+    void execute() override;
+    void undo() override;
+};
+
+class AddNewOutput : ICommand {
+private:
+    IComponentFieldController* field;
+    bool isExecuted = false;
+public:
+    AddNewOutput(IComponentFieldController* field);
+    void execute() override;
+    void undo() override;
+};
+
+class RemoveOutput : ICommand {
+private:
+    IComponentFieldController* field;
+    bool isExecuted = false;
+public:
+    RemoveOutput(IComponentFieldController* field);
+    void execute() override;
+    void undo() override;
+};
 
 #endif //PROJECT_COMMAND_H

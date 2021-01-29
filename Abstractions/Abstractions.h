@@ -14,6 +14,7 @@ class ICommand {
 public:
     virtual void execute() = 0;
     virtual void undo() = 0;
+    virtual ~ICommand() = default;
 };
 
 class IController {
@@ -22,11 +23,15 @@ public:
     virtual void render() = 0;
     virtual void block() = 0;
     virtual void unblock() = 0;
+    virtual void setPosition(float x, float y) = 0;
+    virtual void setSize(float x, float y) = 0;
+    virtual float getSizeX() = 0;
+    virtual float getSizeY() = 0;
 };
 
 class IWireController {
 public:
-    virtual void checkEvents(WindowEvent, bool ConnectorBlock) = 0;
+    virtual void checkEvents(WindowEvent) = 0;
     virtual void render() = 0;
     virtual void block() = 0;
     virtual void unblock() = 0;
@@ -37,7 +42,7 @@ public:
 
 class IConnectorController {
 public:
-    virtual void checkEvents(WindowEvent, bool WireBlock) = 0;
+    virtual void checkEvents(WindowEvent) = 0;
     virtual void render() = 0;
     virtual void block() = 0;
     virtual void unblock() = 0;
@@ -49,20 +54,25 @@ public:
 
 class IComponentController {
 public:
-    virtual void checkEvents(WindowEvent,bool WireBlock, bool ConnectorBlock) = 0;
+    virtual void checkEvents(WindowEvent) = 0;
     virtual void render() = 0;
     virtual void block() = 0;
-    virtual void unblock() = 0;
+    virtual void unblockAll() = 0;
+    virtual void blockWires() = 0;
+    virtual void blockConnectors() = 0;
     virtual void setPosition(float x, float y) = 0;
-    virtual IComponent* getComponent() = 0;
+    virtual Component* getComponent() = 0;
+    virtual void setComponent(Component* component) = 0;
+    virtual float getSizeX() = 0;
+    virtual float getSizeY() = 0;
     virtual float getPositionX() = 0;
     virtual float getPositionY() = 0;
     virtual ~IComponentController() = default;
 };
 
-class IComponentFieldController : public IController {
+class IComponentFieldController {
 public:
-    virtual IComponentController* addNewComponent(float x, float y) = 0;
+    virtual IComponentController* addNewComponent(IComponentController* controller,float x, float y) = 0;
     virtual void removeComponent(IComponentController* controller) = 0;
     virtual void addInput() = 0;
     virtual void removeInput() = 0;

@@ -7,11 +7,15 @@ FieldConnectorController::FieldConnectorController(FieldParam, ConnectorParam) :
 
 }
 
-void FieldConnectorController::checkEvents(sf::Event event, bool WireBlock) {
+void FieldConnectorController::checkEvents(sf::Event event) {
     if (isBlocked) return;
     // Some logic...
 }
 
 void FieldConnectorController::render() {
     // Some logic...
+}
+
+void FieldConnectorController::connectToWire(IWireController *wire) {
+
 }

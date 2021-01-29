@@ -7,12 +7,12 @@ ComponentWireController::ComponentWireController(ComponentParam, WireParam) : Co
 
 }
 
-void ComponentWireController::checkEvents(sf::Event event, bool ConnectorBlock) {
+void ComponentWireController::checkEvents(sf::Event event) {
     if (isBlocked) return;
-    // Some logic...
+    // TODO create function checkEvents()
 }
 
 void ComponentWireController::render() {
-    // Some logic
+    // TODO create function render()
 }
 

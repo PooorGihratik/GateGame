@@ -3,7 +3,8 @@
 //
 
 #include "GameWindow.h"
-#include "Controllers/ComponentFieldController.h"
+#include "ComponentFieldController.h"
+#include "ComponentListController.h"
 
 #define WindowWidth sf::VideoMode::getDesktopMode().width
 #define WindowHeight sf::VideoMode::getDesktopMode().height
@@ -25,19 +26,37 @@ void GameWindow::lostFocusEvent() {
 }
 
 void GameWindow::init() {
-    ComponentFieldController controller(this,Vector2f(0,0),Vector2f(WindowWidth,WindowHeight));
-
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 16;
-    window = new RenderWindow(sf::VideoMode::getDesktopMode(), "PIZDEEEEES",sf::Style::Fullscreen, settings);
+    settings.antialiasingLevel = 8;
+    window = new RenderWindow(sf::VideoMode::getDesktopMode(), "PIZDEEEEES",sf::Style::Default, settings);
+
+    ComponentFieldController field(this);
+    ComponentListController list(this, &field);
+
+    field.setPosition(0,0);
+    field.setSize(800,600);
+
+    list.setPosition(800,0);
+    list.setSize(200,600);
+
+    controllerList.push_back(&field);
+    controllerList.push_back(&list);
+
     while(window->isOpen()) updateLoop();
 }
 
 void GameWindow::updateLoop() {
     Event event;
     while(window->pollEvent(event)) {
+        if (event.type == Event::Closed) window->close();
         checkWindowEvents(event);
     }
+    if (command != nullptr) {
+        command->execute();
+        delete command;
+        command = nullptr;
+    }
+    window->clear();
     render();
     window->display();
 }

@@ -8,11 +8,15 @@ ComponentConnectorController::ComponentConnectorController(ComponentParam, Conne
 
 }
 
-void ComponentConnectorController::checkEvents(sf::Event event, bool WireBlock) {
+void ComponentConnectorController::checkEvents(sf::Event event) {
     if (isBlocked) return;
-    // Some logic...
+
 }
 
 void ComponentConnectorController::render() {
     // Some logic...
+}
+
+void ComponentConnectorController::connectToWire(IWireController *wire) {
+
 }

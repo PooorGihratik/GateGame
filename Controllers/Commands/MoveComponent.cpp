@@ -5,7 +5,7 @@
 
 
 void MoveComponent::execute() {
-    component->setPosition(x,y);
+    component->setPosition(x, y);
     isExecuted = true;
 }
 

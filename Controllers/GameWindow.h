@@ -6,8 +6,8 @@
 #define PROJECT_GAMEWINDOW_H
 #include <list>
 #include <SFML/Graphics.hpp>
-#include "Abstractions/Abstractions.h"
-#include "Core/ComponentNetwork.h"
+#include "../Abstractions/Abstractions.h"
+#include "../Core/ComponentNetwork.h"
 
 using namespace std;
 using namespace sf;
@@ -18,7 +18,7 @@ private:
     list<IController*> controllerList;
     IController* focusedController = nullptr;
     ComponentNetwork* network;
-    ICommand* command;
+    ICommand* command = nullptr;
 public:
     void init();
     void updateLoop();

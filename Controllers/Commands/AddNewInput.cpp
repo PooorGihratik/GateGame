@@ -3,15 +3,15 @@
 //
 #include "Command.h"
 
-AddInput::AddInput(IComponentFieldController *field) : field(field) {
+AddNewInput::AddNewInput(IComponentFieldController *field) : field(field) {
 
 }
 
-void AddInput::execute() {
+void AddNewInput::execute() {
     field->addInput();
     isExecuted = true;
 }
 
-void AddInput::undo() {
+void AddNewInput::undo() {
     if (isExecuted) field->removeInput();
 }

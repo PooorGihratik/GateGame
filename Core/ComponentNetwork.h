@@ -11,17 +11,18 @@
 #include <map>
 #include <list>
 
-class ComponentNetwork : public TransmitEventListener {
+class ComponentNetwork : public TransmitEventListener, public IComponentLogic {
 private:
     list<Wire> inputs;
     list<Connector> outputs;
-    map<IComponent *, int> components;
+    list<Component*> components;
     ComponentFactory factory;
     KeyGenerator generator;
+    string name = "new network...";
 public:
-    IComponent *addComponent();
+    Component* addComponent();
 
-    void removeComponent(IComponent *component);
+    void removeComponent(Component *component);
 
     Wire *addWire();
 
@@ -31,16 +32,16 @@ public:
 
     void removeConnector();
 
-    list<Wire> *getWires() { return &inputs; }
-
-    list<Connector> *getConnectors() { return &outputs; }
-
     ComponentFactory *getFactory() { return &factory; }
-
 
     void invokeEvent() override;
 
     void update();
+
+    bool* getOutputs(bool* input) override;
+    int getCountOfInputs() override { return inputs.size(); }
+    int getCountOfOutputs() override { return outputs.size(); }
+    string getName() override { return name; }
 };
 
 #endif //PROJECT_CUSTOMCOMPONENTS_H

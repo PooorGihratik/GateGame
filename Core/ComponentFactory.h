@@ -10,20 +10,22 @@
 class ComponentFactory {
 private:
     int countOfBasicComponents;
-    vector<IComponent *> components;
+    vector<IComponentLogic*> componentLogicList;
     int selectedComponent = 0;
 public:
     ComponentFactory();
 
-    void addComponentToList(IComponent *component);
+    void addComponentToList(IComponentLogic* logic);
 
     void removeComponentFromList();
 
     void selectComponent(int index);
 
-    IComponent *getSelectedComponent();
+    int getCountOfComponents() { return countOfBasicComponents; }
 
-    IComponent *getComponentByName(const string &name);
+    Component *getSelectedComponent();
+
+    vector<IComponentLogic*>::iterator getIterator() { return componentLogicList.begin(); }
 
     ~ComponentFactory();
 };

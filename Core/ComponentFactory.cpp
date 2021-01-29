@@ -4,40 +4,35 @@
 #include "ComponentFactory.h"
 
 ComponentFactory::ComponentFactory() {
-    components.push_back(new AND());
-    components.push_back(new NOT());
-    countOfBasicComponents = components.size();
+    componentLogicList.push_back(new AND());
+    componentLogicList.push_back(new NOT());
+    countOfBasicComponents = componentLogicList.size();
 }
 
-void ComponentFactory::addComponentToList(IComponent *component) {
-
+void ComponentFactory::addComponentToList(IComponentLogic* logic) {
+    if (logic != nullptr) componentLogicList.push_back(logic);
 }
 
 void ComponentFactory::removeComponentFromList() {
     if (selectedComponent < countOfBasicComponents) return;
-    auto iterator = components.begin() + selectedComponent;
-    components.erase(iterator);
+    auto iterator = componentLogicList.begin() + selectedComponent;
+    delete *iterator;
+    componentLogicList.erase(iterator);
 }
 
-IComponent *ComponentFactory::getSelectedComponent() {
-    return components[selectedComponent]->clone();
+Component *ComponentFactory::getSelectedComponent() {
+    return new Component(componentLogicList[selectedComponent]);
 }
 
 void ComponentFactory::selectComponent(int index) {
-    if (index > 0 && index <= components.size()) {
-        selectedComponent = index - 1;
+    if (index >= 0 && index < componentLogicList.size()) {
+        selectedComponent = index;
     }
 }
 
 ComponentFactory::~ComponentFactory() {
-    for (auto &component:components) {
+    for (auto &component:componentLogicList) {
         delete component;
-    }
-}
-
-IComponent *ComponentFactory::getComponentByName(const string &name) {
-    for (auto &component:components) {
-        if (component->getName() == name) return component->clone();
     }
 }
 

@@ -10,9 +10,12 @@ void Connector::connect(Wire *wire) {
     if (wire != nullptr) {
         wire->connect(&inputValue);
         connectedWire = wire;
+        f_isConnected = true;
         wire->DisconnectAllEvent::attachListener(this);
-        wire->TransmitEvent::attachListener(component);
-        wire->TransmitEvent::notifyListeners();
+        if (component != nullptr) {
+            wire->TransmitEvent::attachListener(component);
+        }
+        wire->transmitCurrentState();
     }
 }
 
@@ -20,8 +23,11 @@ void Connector::disconnect() {
     if (connectedWire != nullptr) {
         connectedWire->disconnect(&inputValue);
         connectedWire->DisconnectAllEvent::detachListener(this);
-        connectedWire->TransmitEvent::detachListener(component);
+        if (component != nullptr) {
+            connectedWire->TransmitEvent::detachListener(component);
+        }
         connectedWire = nullptr;
+        f_isConnected = false;
     }
 }
 
@@ -36,16 +42,6 @@ void Wire::disconnectAll() {
     DisconnectAllEvent::notifyListeners();
     DisconnectAllEvent::eraseAllListeners();
     TransmitEvent::eraseAllListeners();
-}
-
-void Wire::transmitToAll(bool variable) {
-    value = variable;
-    if (!destinations.empty()) {
-        for (auto &destination : destinations) {
-            *destination = value;
-            TransmitEvent::notifyListeners();
-        }
-    }
 }
 
 void Wire::transmitCurrentState() {

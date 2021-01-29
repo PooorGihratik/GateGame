@@ -8,7 +8,7 @@ FieldWireController::FieldWireController(FieldParam, WireParam) : WireInit, Fiel
 
 }
 
-void FieldWireController::checkEvents(sf::Event event, bool ConnectorBlock) {
+void FieldWireController::checkEvents(sf::Event event) {
     if (isBlocked) return;
     // Some logic...
 }

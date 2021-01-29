@@ -7,7 +7,10 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include "Events/Event.h"
+#include "ComponentLogic.h"
+#include <iostream>
 
 using namespace std;
 
@@ -26,8 +29,6 @@ public:
 
     void disconnectAll();
 
-    void transmitToAll(bool value);
-
     void transmitCurrentState();
 };
 
@@ -36,102 +37,33 @@ private:
     Wire *connectedWire = nullptr;
     bool inputValue = false;
     bool f_isConnected = false;
-    TransmitEventListener *component;
+    TransmitEventListener *component = nullptr;
 public:
+    Connector() = default;
     explicit Connector(TransmitEventListener *component) : component(component) {}
-
     void connect(Wire *wire);
-
     void invokeEvent() override;
-
     bool getValue() const { return inputValue; }
-
     bool isConnected() const { return f_isConnected; }
-
     void disconnect();
 };
 
-class IComponent : public TransmitEventListener {
-public:
-    virtual ~IComponent() = default;
-
-    virtual Connector *getConnectors() = 0;
-
-    virtual Wire *getWires() = 0;
-
-    virtual int getCountOfOutputs() = 0;
-
-    virtual int getCountOfInputs() = 0;
-
-    virtual string getName() = 0;
-
-    virtual void update() = 0;
-
-    virtual void clearAllConnections() = 0;
-
-    virtual IComponent *clone() = 0;
-};
-
-class AND final : public IComponent {
+class Component : public TransmitEventListener {
 private:
-    const string name = "AND";
-    const int countOfInputs = 2;
-    const int countOfOutputs = 1;
-    Connector inputs[2];
-    Wire output;
+    IComponentLogic* logic;
+    vector<Connector> connectors;
+    vector<Wire> wires;
 public:
-    AND() : inputs{Connector(this), Connector(this)} {};
+    Component(IComponentLogic* logic);
 
-    ~AND() override;
-
-    string getName() override { return name; }
-
-    Wire *getWires() override { return &output; }
-
-    Connector *getConnectors() override { return inputs; }
-
-    int getCountOfInputs() override { return countOfInputs; }
-
-    int getCountOfOutputs() override { return countOfOutputs; }
-
-    void update() override;
-
-    void clearAllConnections() override;
-
+    vector<Connector>::iterator getConnectors();
+    vector<Wire>::iterator getWires();
+    int getCountOfOutputs() { return logic->getCountOfOutputs(); }
+    int getCountOfInputs() { return logic->getCountOfInputs(); }
+    string getName() { return logic->getName(); }
+    void clearAllConnections();
+    void findOutputs();
+    Component *clone();
     void invokeEvent() override;
-
-    IComponent *clone() override;
 };
-
-class NOT final : public IComponent {
-private:
-    const string name = "NOT";
-    const int countOfInputs = 1;
-    const int countOfOutputs = 1;
-    Connector input;
-    Wire output;
-public:
-    NOT() : input(Connector(this)) {};
-
-    ~NOT() override;
-
-    string getName() override { return name; }
-
-    int getCountOfInputs() override { return countOfInputs; }
-
-    int getCountOfOutputs() override { return countOfOutputs; }
-
-    Wire *getWires() override { return &output; }
-
-    Connector *getConnectors() override { return &input; }
-
-    void update() override;
-
-    void clearAllConnections() override;
-
-    void invokeEvent() override;
-
-    IComponent *clone() override;
-};
-
 #endif //PROJECT_COMPONENT_H
