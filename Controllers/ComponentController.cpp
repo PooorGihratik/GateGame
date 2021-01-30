@@ -9,46 +9,81 @@
 #define InitList component(component), field(field), window(window) ,color(color)
 #define ConstructorParams Component *component, ComponentFieldController *field, RenderWindow* window, Color color
 
-#define CharacterSize 15
-#define TextPadding 10
+#define CharacterSize 20
+#define TextPadding 14
+#define VerticalPadding 7
 #define BrightColor Color(30,30,30)
 
 ComponentController::ComponentController(ConstructorParams)  : InitList {
+    // Getting iterators for connections
     auto wires = component->getWires();
     auto connectors = component->getConnectors();
+
+    // Calculating width of component
     float tempLength = ConnectionDistance;
     for (int i = 0; i<component->getCountOfInputs();i++) {
-        wireControllers.push_back(new ComponentWireController(this,&*wires));
+        connectorControllers.push_back(new ConnectorController(this,&*connectors, field->getWindow()));
         tempLength += 2 * ConnectionRadius + ConnectionDistance;
-        wires++;
+        connectors++;
     }
     float width = tempLength;
     tempLength = ConnectionDistance;
     for (int i = 0; i<component->getCountOfOutputs();i++) {
-        connectorControllers.push_back(new ComponentConnectorController(this,&*connectors));
-        tempLength += 2 * ConnectionRadius + ConnectionDistance;
-        connectors++;
+        wireControllers.push_back(new WireController(this,&*wires, field->getWindow()));
+        tempLength += ConnectionRadius + ConnectionRadius + ConnectionDistance;
+        wires++;
     }
+    // Finding the maximum width between 2 sides of Component
     width = width >= tempLength ? width : tempLength;
-    width = width >= 2 * CharacterSize + 2 * TextPadding ? width : 2 * CharacterSize + TextPadding;
+
     if (!font.loadFromFile(R"(D:\CLionProjects\GateGame\resources\fonts\20339.ttf)"))
     {
         cout << "fonts dont loaded" << endl;
     }
     text = Text(component->getName(),font,CharacterSize);
     text.setFillColor(sf::Color::White);
-    float length = 2*TextPadding + text.getLocalBounds().width;
+    verticalTextPadding = VerticalPadding;
+    // Setting the minimum width, if its too small to contain text
+    if (width > text.getLocalBounds().height * 2 + 2 * VerticalPadding ) {
+        verticalTextPadding = width - text.getLocalBounds().height * 2;
+        verticalTextPadding /= 2;
+    }
+    else width =  text.getLocalBounds().height*2 + VerticalPadding * 2;
+    float length = 2 * TextPadding + text.getLocalBounds().width;
+
+    // Setting relative position of connectors
+    float initialDistance = width - 2 * component->getCountOfInputs() * ConnectionRadius - ConnectionDistance * (component->getCountOfInputs() - 1);
+    initialDistance /= 2;
+    tempLength = initialDistance + ConnectionRadius;
+    auto c_iter = connectorControllers.begin();
+    for (int i = 0; i<component->getCountOfInputs();i++) {
+        (*c_iter)->setRelativePosition(0,tempLength);
+        tempLength += ConnectionDistance + 2*ConnectionRadius;
+        c_iter++;
+    }
+
+    // Setting relative position of wires
+    initialDistance = width - 2 * component->getCountOfOutputs() * ConnectionRadius + ConnectionDistance * (component->getCountOfOutputs() - 1);
+    initialDistance /= 2;
+    tempLength = initialDistance + ConnectionRadius;
+    auto w_iter = wireControllers.begin();
+    for (int i = 0; i<component->getCountOfOutputs();i++) {
+        (*w_iter)->setRelativePosition(length,tempLength);
+        tempLength += ConnectionDistance + ConnectionRadius;
+        w_iter++;
+    }
+
     size = Vector2f(length, width);
     shape = RectangleShape(size);
     shape.setFillColor(color);
 }
 
 ComponentController::~ComponentController() {
-    for (int i = 0; i<component->getCountOfInputs();i++) {
+    for (int i = 0; i<component->getCountOfOutputs();i++) {
         delete wireControllers.back();
         wireControllers.pop_back();
     }
-    for (int i = 0; i<component->getCountOfOutputs();i++) {
+    for (int i = 0; i<component->getCountOfInputs();i++) {
         delete connectorControllers.back();
         connectorControllers.pop_back();
     }
@@ -79,6 +114,7 @@ void ComponentController::checkEvents(Event event) {
         case sf::Event::MouseButtonPressed:
             if (mouseHover && event.mouseButton.button == sf::Mouse::Left) {
                 isDragged = true;
+                diff = renderPosition - Vector2f(Mouse::getPosition(*window));
                 field->componentFocusEvent(this);
             }
             break;
@@ -87,7 +123,7 @@ void ComponentController::checkEvents(Event event) {
         Vector2f mouseMotion = Vector2f(event.mouseMove.x,event.mouseMove.y);
         mouseHover = isInside(mouseMotion, Vector2f(0, 0));
         if (isDragged) {
-            renderPosition = mouseMotion;
+            renderPosition = mouseMotion + diff;
         }
     }
 }
@@ -118,14 +154,14 @@ void ComponentController::blockConnectors() {
     }
 }
 
-void ComponentController::gotConnectorFocus(IConnectorController* connector) {
+void ComponentController::connectorFocusEvent(IConnectorController* connector) {
     field->connectorFocusEvent(connector);
     for ( auto connectorController : connectorControllers ) {
         if (connectorController == connector) connectorController->unblock();
     }
 }
 
-void ComponentController::gotWireFocus(IWireController* wire) {
+void ComponentController::wireFocusEvent(IWireController* wire) {
     field->wireFocusEvent(wire);
     for ( auto wireController : wireControllers ) {
         if (wire == wireController) wireController->unblock();
@@ -134,9 +170,11 @@ void ComponentController::gotWireFocus(IWireController* wire) {
 
 void ComponentController::render() {
     for (auto input : wireControllers) {
+        input->setPosition(renderPosition.x, renderPosition.y);
         input->render();
     }
     for (auto output : connectorControllers) {
+        output->setPosition(renderPosition.x, renderPosition.y);
         output->render();
     }
 
@@ -158,7 +196,7 @@ void ComponentController::render() {
         shape.setPosition(renderPosition);
     }
 
-    text.setPosition(renderPosition.x + TextPadding,renderPosition.y + TextPadding);
+    text.setPosition(renderPosition.x + TextPadding,renderPosition.y + verticalTextPadding);
     window->draw(shape);
     window->draw(text);
     for ( auto wireController : wireControllers ) {

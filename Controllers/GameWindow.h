@@ -6,7 +6,7 @@
 #define PROJECT_GAMEWINDOW_H
 #include <list>
 #include <SFML/Graphics.hpp>
-#include "../Abstractions/Abstractions.h"
+#include "Abstractions/Abstractions.h"
 #include "../Core/ComponentNetwork.h"
 
 using namespace std;

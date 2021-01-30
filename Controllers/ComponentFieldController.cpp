@@ -29,10 +29,6 @@ void ComponentFieldController::render() {
     for (auto controller:controllers) {
         controller->render();
     }
-    /*auto iter = controllers.end();
-    for (int i = 0; i< controllers.size();i++) {
-        (*--iter)->render();
-    }*/
 }
 
 bool ComponentFieldController::hasSizeAndPosition() {
@@ -42,14 +38,14 @@ bool ComponentFieldController::hasSizeAndPosition() {
 void ComponentFieldController::checkWindowEvents(sf::Event event) {
     if (isBlocked) return;
     auto iter = controllers.end();
-    for (int i = 0; i< controllers.size();i++) {
-        (*--iter)->checkEvents(event);
-    }
     for (auto input:inputControllers) {
         input->checkEvents(event);
     }
     for (auto output:outputControllers) {
         output->checkEvents(event);
+    }
+    for (int i = 0; i< controllers.size();i++) {
+        (*--iter)->checkEvents(event);
     }
 }
 
@@ -100,14 +96,15 @@ IComponentController* ComponentFieldController::addNewComponent(IComponentContro
 }
 
 void ComponentFieldController::removeComponent(IComponentController* controller) {
-    network.removeComponent(controller->getComponent());
-    controllers.remove(controller);
+    Component* component = controller->getComponent();
     delete controller;
+    network.removeComponent(component);
+    controllers.remove(controller);
 }
 
 void ComponentFieldController::addInput() {
     Wire* wire = network.addWire();
-    inputControllers.push_back(new FieldWireController(this,wire));
+    inputControllers.push_back(new WireController(this,wire, getWindow()));
 }
 
 void ComponentFieldController::removeInput() {
@@ -118,7 +115,7 @@ void ComponentFieldController::removeInput() {
 
 void ComponentFieldController::addOutput() {
     Connector* connector = network.addConnector();
-    outputControllers.push_back(new FieldConnectorController(this,connector));
+    outputControllers.push_back(new ConnectorController(this,connector,getWindow()));
 }
 
 void ComponentFieldController::removeOutput() {

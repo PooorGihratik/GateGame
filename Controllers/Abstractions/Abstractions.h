@@ -5,7 +5,7 @@
 #ifndef PROJECT_ABSTRACTIONS_H
 #define PROJECT_ABSTRACTIONS_H
 
-#include "../Core/Component.h"
+#include "../../Core/Component.h"
 
 #include <SFML/Graphics.hpp>
 #define WindowEvent sf::Event event
@@ -37,6 +37,7 @@ public:
     virtual void unblock() = 0;
     virtual void setPosition(float x, float y) = 0;
     virtual Wire* getWire() = 0;
+    virtual void setRelativePosition(float x, float y) = 0;
     virtual ~IWireController() = default;
 };
 
@@ -49,6 +50,7 @@ public:
     virtual void setPosition(float x, float y) = 0;
     virtual void connectToWire(IWireController* wire) = 0;
     virtual Connector* getConnector() = 0;
+    virtual void setRelativePosition(float x, float y) = 0;
     virtual ~IConnectorController() = default;
 };
 
@@ -78,6 +80,12 @@ public:
     virtual void removeInput() = 0;
     virtual void addOutput() = 0;
     virtual void removeOutput() = 0;
+};
+
+class IConnectionBase {
+public:
+    virtual void wireFocusEvent(IWireController* wire) = 0;
+    virtual void connectorFocusEvent(IConnectorController* connector) = 0;
 };
 
 

@@ -6,10 +6,10 @@
 #define PROJECT_COMPONENTCONTROLLER_H
 
 #include <list>
-#include "../Abstractions/Abstractions.h"
+#include "Abstractions/Abstractions.h"
 #include "ComponentFieldController.h"
 
-class ComponentController : public IComponentController {
+class ComponentController : public IComponentController, public IConnectionBase {
 private:
     Component* component;
     ComponentFieldController* field;
@@ -18,9 +18,11 @@ private:
     RenderWindow* window;
     bool isBlocked = false;
     bool isDragged = false, mouseHover = false;
+    float verticalTextPadding = 0;
     Vector2f position;
     Vector2f size;
     Vector2f renderPosition;
+    Vector2f diff;
     RectangleShape shape;
     Color color;
     Text text;
@@ -59,8 +61,8 @@ public:
         return field->isInsideField(objPos,size);
     }
 
-    void gotWireFocus(IWireController* wire);
-    void gotConnectorFocus(IConnectorController* connector);
+    void wireFocusEvent(IWireController* wire) override;
+    void connectorFocusEvent(IConnectorController* connector) override;
 
     // TODO Create command pass mechanism
     void setConnectionCommand(ICommand* command) { field->setCommand(command); }

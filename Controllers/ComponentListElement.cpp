@@ -42,6 +42,7 @@ void ComponentListElement::checkWindowEvents(Event event) {
             if (event.mouseButton.button == sf::Mouse::Left && mouseHover) {
                 list->gotFocus();
                 list->setComponent(index);
+                diff = renderPosition - Vector2f(Mouse::getPosition(*list->getWindow()));
                 isDragged = true;
             }
             break;
@@ -50,7 +51,7 @@ void ComponentListElement::checkWindowEvents(Event event) {
         Vector2f mouseMotion = Vector2f(event.mouseMove.x,event.mouseMove.y);
         mouseHover = component->isInside(mouseMotion, Vector2f(0, 0));
         if (isDragged) {
-            renderPosition = mouseMotion;
+            renderPosition = mouseMotion + diff;
             component->setPosition(renderPosition.x, renderPosition.y);
         }
         else renderPosition = position;

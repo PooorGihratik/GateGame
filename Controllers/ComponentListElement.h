@@ -15,6 +15,7 @@ private:
     bool isDragged = false;
     Vector2f position;
     Vector2f renderPosition;
+    Vector2f diff;
     IComponentLogic* logic;
     ComponentController* component;
     ComponentListController* list;

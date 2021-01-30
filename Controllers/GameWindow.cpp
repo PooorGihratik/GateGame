@@ -28,7 +28,7 @@ void GameWindow::lostFocusEvent() {
 void GameWindow::init() {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    window = new RenderWindow(sf::VideoMode::getDesktopMode(), "PIZDEEEEES",sf::Style::Default, settings);
+    window = new RenderWindow(sf::VideoMode::getDesktopMode(), "GateGame",sf::Style::Default, settings);
 
     ComponentFieldController field(this);
     ComponentListController list(this, &field);

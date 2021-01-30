@@ -5,85 +5,54 @@
 #ifndef PROJECT_CONNECTIONSCONTROLLER_H
 #define PROJECT_CONNECTIONSCONTROLLER_H
 
-#include "../../Abstractions/Abstractions.h"
+#include "../Abstractions/Abstractions.h"
 #include "../ComponentController.h"
+#include "ConnectionRender.h"
 
-#define ComponentParam ComponentController *component
+#define BaseParam IConnectionBase* base
 #define WireParam Wire *wire
 #define ConnectorParam Connector *connector
-#define FieldParam ComponentFieldController* field
 
-#define ComponentInit component(component)
+#define BaseInit base(base)
 #define WireInit wire(wire)
 #define ConnectorInit connector(connector)
-#define FieldInit field(field)
+#define RendererInit renderer(ConnectionRender(window,ConnectionRadius))
 
-class ComponentWireController : public IWireController {
+class WireController : public IWireController {
 private:
-    ComponentController* component;
+    IConnectionBase* base;
     Wire* wire;
-    float radius = ConnectionRadius;
-    Vector2f position;
+    ConnectionRender renderer;
+    bool mouseHover = false;
     bool isBlocked = false;
+
+    CircleShape shape;
 public:
-    ComponentWireController(ComponentController* component,Wire* wire);
+    WireController(IConnectionBase* base, Wire* wire, RenderWindow* window);
     void checkEvents(sf::Event event) override;
     void block() override { isBlocked = true; }
     void unblock() override { isBlocked = false; }
-    void setPosition(float x, float y) override { position = Vector2f(x,y); }
+    void setPosition(float x, float y) override { renderer.setPosition(Vector2f(x,y)); }
+    void setRelativePosition(float x, float y) override { renderer.setRelativePosition(Vector2f(x,y)); }
     void render() override;
     Wire* getWire() override { return wire; }
 };
 
-class FieldWireController : public IWireController {
+class ConnectorController : public IConnectorController {
 private:
-    ComponentFieldController* field;
-    Wire* wire;
-    float radius = ConnectionRadius;
-    Vector2f position;
-    bool isBlocked = false;
-public:
-    FieldWireController(ComponentFieldController* field, Wire* wire);
-    void checkEvents(sf::Event event) override;
-    void block() override { isBlocked = true; }
-    void unblock() override { isBlocked = false; }
-    void setPosition(float x, float y) override { position = Vector2f(x,y); }
-    void render() override;
-    Wire* getWire() override { return wire; }
-};
-
-class ComponentConnectorController : public IConnectorController {
-private:
-    ComponentController* component;
+    IConnectionBase* base;
     Connector* connector;
-    float radius = ConnectionRadius;
-    Vector2f position;
+    ConnectionRender renderer;
     bool isBlocked = false;
+    bool mouseHover = false;
+    CircleShape shape;
 public:
-    ComponentConnectorController(ComponentController* component,Connector* connector);
+    ConnectorController(IConnectionBase* base, Connector* connector, RenderWindow* window);
     void checkEvents(sf::Event event) override;
     void block() override { isBlocked = true; }
     void unblock() override { isBlocked = false; }
-    void setPosition(float x, float y) override { position = Vector2f(x,y); }
-    void render() override;
-    Connector* getConnector() override { return connector; }
-
-    void connectToWire(IWireController *wire) override;
-};
-
-class FieldConnectorController : public IConnectorController {
-private:
-    ComponentFieldController* field;
-    Connector* connector;
-    float radius = ConnectionRadius;
-    Vector2f position;
-    bool isBlocked = false;
-public:
-    FieldConnectorController(ComponentFieldController* field, Connector* connector);
-    void checkEvents(sf::Event event) override;
-    void block() override { isBlocked = true; }
-    void unblock() override { isBlocked = false; }
-    void setPosition(float x, float y) override { position = Vector2f(x,y); }
+    void setPosition(float x, float y) override { renderer.setPosition(Vector2f(x,y)); }
+    void setRelativePosition(float x, float y) override { renderer.setRelativePosition(Vector2f(x,y)); }
     void render() override;
     Connector* getConnector() override { return connector; }
 
